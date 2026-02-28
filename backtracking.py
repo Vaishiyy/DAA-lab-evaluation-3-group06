@@ -91,4 +91,7 @@ class EightPuzzleUI:
         self.solution_path = []
         self.exploration_index = 0
         self.solution_index = 0
-    
+
+         # Create UI
+        self.create_ui()
+        self.start_timer()
