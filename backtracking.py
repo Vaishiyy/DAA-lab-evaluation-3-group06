@@ -32,3 +32,26 @@ def generate_neighbors(state):
         neighbors.append(tuple(new_state))
     
     return neighbors
+def pure_backtrack_simple(current, goal, visited, path, explored_states, depth=0, max_depth=100):
+    
+    # Manages visited states, explored list, and solution path
+    explored_states.append(current)
+    # Base case: goal found
+    if current == goal:
+        return path + [current]
+    # Prevent infinite recursion
+    if depth > max_depth:
+        return None
+    # Mark as visited
+    visited.add(current)
+    # Generate neighbors on-the-fly
+    neighbors = generate_neighbors(current)
+    # Try each unvisited neighbor
+    for neighbor in neighbors:
+        if neighbor not in visited:
+            result = pure_backtrack_simple(neighbor, goal, visited, path + [current], 
+                                          explored_states, depth + 1, max_depth)
+            if result is not None:
+                return result
+    return None
+
