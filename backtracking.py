@@ -501,3 +501,8 @@ class EightPuzzleUI:
             "LEFT SIDE: Shows the algorithm's exploration process\n"
             "RIGHT SIDE: Shows the final solution path"
         )
+
+if _name_ == "_main_":
+    root = tk.Tk()
+    app = EightPuzzleUI(root)
+    root.mainloop()
