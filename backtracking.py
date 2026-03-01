@@ -95,7 +95,7 @@ class EightPuzzleUI:
          # Create UI
         self.create_ui()
         self.start_timer()
-     def create_ui(self):
+    def create_ui(self):
         """Create the user interface with dual visualization"""
         
         # Main container
