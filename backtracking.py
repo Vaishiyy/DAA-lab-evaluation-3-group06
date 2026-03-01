@@ -69,7 +69,7 @@ def pure_backtrack_simple(current, goal, visited, path, explored_states, depth=0
 class EightPuzzleUI:
     """Main UI for 8-Puzzle Game with Dual Visualization"""
     
-    def _init_(self, root):
+    def __init__(self, root):
         self.root = root
         self.root.title("8-Puzzle Solver - Dual Visualization")
         self.root.geometry("1400x750")
