@@ -7,16 +7,14 @@ import threading
 import os
 from copy import deepcopy
 
-# ------------------ PATH ------------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# ------------------ CONSTANTS ------------------
 TILE = 160
 BOARD_SIZE = 480
 BG_COLOR = "misty rose"
 
-GOAL = (1,2,3,4,5,6,7,8,0)
-DIRS=[(-1,0),(1,0),(0,-1),(0,1)]
+GOAL = (1, 2, 3, 4, 5, 6, 7, 8, 0)
+DIRS = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 
 # -------------------------------------------------
 # MOVE GENERATOR
@@ -34,44 +32,38 @@ def neighbors(state):
             res.append(tuple(lst))
     return res
 
-
-# -------------------------------------------------
-# HEURISTIC
-# -------------------------------------------------
+#HEURISTIC
 def h(state):
-    dist=0
-    for i,v in enumerate(state):
-        if v==0: continue
-        goal=v-1
-        r1,c1=divmod(i,3)
-        r2,c2=divmod(goal,3)
-        dist+=abs(r1-r2)+abs(c1-c2)
+    """Manhattan distance heuristic."""
+    dist = 0
+    for i, v in enumerate(state):
+        if v == 0:
+            continue
+        goal_index = v - 1
+        r1, c1 = divmod(i, 3)
+        r2, c2 = divmod(goal_index, 3)
+        dist += abs(r1 - r2) + abs(c1 - c2)
     return dist
 
 
-# -------------------------------------------------
-# A* SOLVER (CONQUER STEP)
-# -------------------------------------------------
 def astar(start, goal_check):
-
-    pq=[]
-    heapq.heappush(pq,(h(start),0,start,[start]))
-    visited=set()
-
+    """
+    A* search from start until goal_check(state) is True.
+    Returns the path as a list of states.
+    """
+    pq = []
+    heapq.heappush(pq, (h(start), 0, start, [start]))
+    visited = set()
     while pq:
-        f,g,state,path=heapq.heappop(pq)
-
+        f, g, state, path = heapq.heappop(pq)
         if goal_check(state):
             return path
-
         if state in visited:
             continue
         visited.add(state)
-
         for nxt in neighbors(state):
             if nxt not in visited:
-                heapq.heappush(pq,(g+1+h(nxt),g+1,nxt,path+[nxt]))
-
+                heapq.heappush(pq, (g + 1 + h(nxt), g + 1, nxt, path + [nxt]))
     return None
 
 
@@ -336,4 +328,5 @@ class PuzzleApp:
 if __name__=="__main__":
     root=tk.Tk()
     PuzzleApp(root)
+
     root.mainloop()
