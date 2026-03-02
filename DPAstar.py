@@ -29,7 +29,76 @@ goal_positions = {
     8: (2, 1),
 }
 
+# A* + DP SEARCH ENGINE
 
+def manhattan(state):
+    distance = 0
+    for i, tile in enumerate(state):
+        if tile == 0:
+            continue
+        r, c = divmod(i, 3)
+        gr, gc = goal_positions[tile]
+        distance += abs(r - gr) + abs(c - gc)
+    return distance
+
+
+def get_neighbors(state):
+    neighbors = []
+    zero_index = state.index(0)
+    r, c = divmod(zero_index, 3)
+
+    for dr, dc in DIRS:
+        nr, nc = r + dr, c + dc
+        if 0 <= nr < 3 and 0 <= nc < 3:
+            new_index = nr * 3 + nc
+            new_state = list(state)
+            new_state[zero_index], new_state[new_index] = (
+                new_state[new_index],
+                new_state[zero_index],
+            )
+            neighbors.append(tuple(new_state))
+
+    return neighbors
+
+
+def reconstruct_path(parent, state):
+    path = []
+    while state is not None:
+        path.append(state)
+        state = parent[state]
+    path.reverse()
+    return path
+
+
+def astar_dp(start):
+    open_heap = []
+    heapq.heappush(open_heap, (manhattan(start), 0, start))
+
+    g_score = {start: 0}
+    parent = {start: None}
+    visited = set()
+
+    while open_heap:
+        _, g, current = heapq.heappop(open_heap)
+
+        if current == GOAL_STATE:
+            return reconstruct_path(parent, current)
+
+        if current in visited:
+            continue
+
+        visited.add(current)
+
+        for neighbor in get_neighbors(current):
+            tentative_g = g + 1
+
+            if neighbor not in g_score or tentative_g < g_score[neighbor]:
+                g_score[neighbor] = tentative_g
+                parent[neighbor] = current
+                f_score = tentative_g + manhattan(neighbor)
+                heapq.heappush(open_heap, (f_score, tentative_g, neighbor))
+
+    return None
 
 
 # SECTION 3 — GUI STRUCTURE (UI BUILDER)
