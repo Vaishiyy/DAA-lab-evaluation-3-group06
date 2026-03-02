@@ -33,39 +33,50 @@ def generate_neighbors(state):
     
     return neighbors
     
-def pure_backtrack_simple(current, goal, visited, path, explored_states, depth=0, max_depth=100):
+def pure_backtrack_simple(current, goal, visited, path, explored_states, stop_requested,
+    depth=0,
+    max_depth=100,
+):
     """
-    Pure Simple Recursive Backtracking Algorithm
-    Now also tracks ALL explored states in order
+    Pure simple recursive backtracking algorithm.
+    Also records all explored states in order and supports cancellation.
+    visited is treated as the current recursion path, not a global closed set.
     """
-    
-    # Record this state as explored
+    if stop_requested():
+        return None
+
     explored_states.append(current)
-    
-    # Base case: goal found
+
     if current == goal:
         return path + [current]
-    
-    # Prevent infinite recursion
+
     if depth > max_depth:
         return None
-    
-    # Mark as visited
+
     visited.add(current)
-    
-    # Generate neighbors on-the-fly
-    neighbors = generate_neighbors(current)
-    
-    # Try each unvisited neighbor
-    for neighbor in neighbors:
+
+    for neighbor in generate_neighbors(current):
+        if stop_requested():
+            visited.remove(current)
+            return None
         if neighbor not in visited:
-            result = pure_backtrack_simple(neighbor, goal, visited, path + [current], 
-                                          explored_states, depth + 1, max_depth)
+            result = pure_backtrack_simple(
+                neighbor,
+                goal,
+                visited,
+                path + [current],
+                explored_states,
+                stop_requested,
+                depth + 1,
+                max_depth,
+            )
             if result is not None:
+                visited.remove(current)
                 return result
-    
-    # Backtrack
+
+    visited.remove(current)
     return None
+
 class EightPuzzleUI:
     """Main UI for 8-Puzzle Game with Dual Visualization"""
     
