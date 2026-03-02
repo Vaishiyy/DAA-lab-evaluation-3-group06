@@ -161,3 +161,82 @@ def preprocess_rows_deterministic(state):
 
     return full_path
 
+def sort_row_with_protection(current, row, solved_rows):
+    start = row * GRID
+    goal_slice = GOAL[start:start + GRID]
+
+    protected_positions = {
+        r * GRID + c: current[r * GRID + c]
+        for r in solved_rows
+        for c in range(GRID)
+    }
+
+    def goal_check(s):
+        return tuple(s[start:start + GRID]) == goal_slice
+
+    def heuristic(s):
+        dist = 0
+        for tile in goal_slice:
+            if tile == 0:
+                continue
+            cur = s.index(tile)
+            r1, c1 = divmod(cur, GRID)
+            r2, c2 = divmod(GOAL_POS[tile], GRID)
+            dist += abs(r1 - r2) + abs(c1 - c2)
+        return dist
+
+    return astar_with_protection(
+        current,
+        goal_check,
+        heuristic,
+        protected_positions
+    )
+
+
+def solver(state):
+    if state == GOAL:
+        return [state]
+
+    preprocess_path = preprocess_rows_deterministic(state)
+    if not preprocess_path:
+        return None
+
+    full_path = preprocess_path
+    current = preprocess_path[-1]
+    if not is_row_preprocessed(current):
+        return None
+
+    solved_rows = []
+
+    # Step 1: solve row 1.
+    if GRID >= 1:
+        path = sort_row_with_protection(current, 0, solved_rows)
+        if not path:
+            return None
+        full_path += path[1:]
+        current = path[-1]
+        solved_rows.append(0)
+
+    # Step 2: solve row 2 while row 1 stays locked.
+    # Row 3 (and below) are free workspace because only solved_rows are protected.
+    if GRID >= 2:
+        path = sort_row_with_protection(current, 1, solved_rows)
+        if not path:
+            return None
+        full_path += path[1:]
+        current = path[-1]
+        solved_rows.append(1)
+
+    # Step 3: solve remaining rows the same way.
+    for row in range(2, GRID):
+        path = sort_row_with_protection(current, row, solved_rows)
+
+        if not path:
+            return None
+
+        full_path += path[1:]
+        current = path[-1]
+        solved_rows.append(row)
+
+    return full_path
+
