@@ -33,7 +33,13 @@ def generate_neighbors(state):
     
     return neighbors
     
-def pure_backtrack_simple(current, goal, visited, path, explored_states, stop_requested,
+def pure_backtrack_simple(
+    current,
+    goal,
+    visited,
+    path,
+    explored_states,
+    stop_requested,
     depth=0,
     max_depth=100,
 ):
@@ -76,6 +82,7 @@ def pure_backtrack_simple(current, goal, visited, path, explored_states, stop_re
 
     visited.remove(current)
     return None
+
 
 class EightPuzzleUI:
     """Main UI for 8-Puzzle Game with Dual Visualization"""
