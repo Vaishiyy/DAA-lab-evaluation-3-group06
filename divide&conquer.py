@@ -239,4 +239,41 @@ def solver(state):
         solved_rows.append(row)
 
     return full_path
+class PuzzleApp:
+    def move_user(self, r, c):
+        if self.solving:
+            return
+
+        i = r * GRID + c
+        zero = self.state.index(0)
+        zr, zc = divmod(zero, GRID)
+
+        if abs(r - zr) + abs(c - zc) == 1:
+            lst = list(self.state)
+            lst[zero], lst[i] = lst[i], lst[zero]
+            self.state = tuple(lst)
+            self.user_steps += 1
+            self.update_display()
+            if self.state == GOAL:
+                messagebox.showinfo(
+                    "Solved",
+                    f"You solved it in {self.user_steps} moves."
+                )
+
+    def shuffle(self):
+        if self.solving:
+            return
+        self.state = shuffle_board()
+        self.user_steps = 0
+        self.ai_steps = 0
+        self.timer_seconds = 0
+        self.update_display()
+    def show_help(self):
+        messagebox.showinfo(
+            "How To Play",
+            "Click tiles adjacent to the empty slot.\n"
+            "Use AI Solve to animate the deterministic solver.\n"
+            "Pause freezes the board exactly at the current step."
+        )
+    
 
