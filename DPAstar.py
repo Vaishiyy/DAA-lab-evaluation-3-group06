@@ -171,3 +171,62 @@ class PuzzleApp:
 
         self.status_lbl = tk.Label(play_area, text="Status: Ready", bg=BG_COLOR)
         self.status _lbl.pack(side="bottom", pady=(0, 20))
+
+# =========================================================
+# SECTION 4 — GAME LOGIC + CONTROLLER
+# =========================================================
+
+    def move_user(self, r, c):
+        if self.solving:
+            return
+
+        index = r * 3 + c
+        zero = self.state.index(0)
+        zr, zc = divmod(zero, 3)
+
+        if abs(r - zr) + abs(c - zc) == 1:
+            new_state = list(self.state)
+            new_state[zero], new_state[index] = new_state[index], new_state[zero]
+            self.state = tuple(new_state)
+            self.move_count += 1
+            self.update_boards()
+
+    def shuffle(self):
+        state = GOAL_STATE
+        for _ in range(50):
+            state = random.choice(get_neighbors(state))
+        self.state = state
+        self.update_boards()
+
+    def solve(self):
+        if self.solving:
+            return
+
+        self.solving = True
+        path = astar_dp(self.state)
+
+        if not path:
+            self.solving = False
+            messagebox.showinfo("No Solution", "Unsolvable configuration!")
+            return
+
+        self.animate(path, 0)
+
+    def animate(self, path, index):
+        if index < len(path):
+            self.state = path[index]
+            self.ai_steps = index
+            self.update_boards()
+            self.root.after(300, lambda: self.animate(path, index + 1))
+        else:
+            self.solving = False
+
+
+# =========================================================
+# PROGRAM ENTRY POINT
+# =========================================================
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    PuzzleApp(root)
+    root.mainloop()
