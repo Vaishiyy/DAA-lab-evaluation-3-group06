@@ -170,7 +170,7 @@ class PuzzleApp:
         tk.Button(controls, text="AI Solve", command=self.solve).pack(side="left", padx=8)
 
         self.status_lbl = tk.Label(play_area, text="Status: Ready", bg=BG_COLOR)
-        self.status _lbl.pack(side="bottom", pady=(0, 20))
+        self.status_lbl.pack(side="bottom", pady=(0, 20))
 
 # =========================================================
 # SECTION 4 — GAME LOGIC + CONTROLLER
