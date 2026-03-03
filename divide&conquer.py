@@ -268,6 +268,35 @@ class PuzzleApp:
         self.ai_steps = 0
         self.timer_seconds = 0
         self.update_display()
+
+    def solve_thread(self):
+        if self.solving:
+            return
+        self.solving = True
+        self.paused = False
+        self.anim_path = None
+        self.anim_idx = 0
+        self.ai_steps = 0
+        self.pause_btn.config(state="normal", text="Pause")
+        self.solve_btn.config(state="disabled")
+        self.update_display()
+        threading.Thread(target=self.solve_ai, daemon=True).start()
+
+    def solve_ai(self):
+        path = solver(self.state)
+        if not path:
+            self.root.after(0, self.solve_failed)
+            return
+        self.root.after(0, lambda p=path: self.start_animation(p))
+
+    def solve_failed(self):
+        self.solving = False
+        self.paused = False
+        self.pause_btn.config(state="disabled", text="Pause")
+        self.solve_btn.config(state="normal")
+        self.update_display()
+        messagebox.showerror("Failed", "Solver could not find solution.")
+        
     def show_help(self):
         messagebox.showinfo(
             "How To Play",
@@ -276,4 +305,5 @@ class PuzzleApp:
             "Pause freezes the board exactly at the current step."
         )
     
+
 
